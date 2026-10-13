@@ -36,6 +36,7 @@ hr{border:0;border-top:1px solid var(--rule);margin:48px 0}
 .built{color:var(--muted);font-size:15px}
 section{scroll-margin-top:20px}
 @media (max-width:440px){ .page{padding-inline:16px} body{font-size:16px} }
+figure{margin:20px 0 22px}figure img{display:block;width:100%;height:auto;border:1px solid var(--rule);border-radius:6px}figcaption{color:var(--muted);font-size:14px;margin-top:8px}
 </style>
 </head>
 <body>
@@ -62,7 +63,11 @@ section{scroll-margin-top:20px}
 
   <p>It has bought domains fully hands off while the client slept, including names like neosono.com and shackmax.com that it held through a dead auction and grabbed the instant they relisted at $50. He's a 28 year veteran of GoDaddy's expiring list with 20,000 domains, not technical, and he now runs his sourcing through this tool instead of the 45 minutes a morning he used to spend scrolling by hand.</p>
 
+  <figure><img src="img/sniper-purchases.jpg" alt="Purchases tab of the auction sniper showing domains won and outbid, with prices and dates" loading="lazy" width="1400" height="1157"><figcaption>The Purchases tab: real buys and bids the tool placed on its own in September 2026. Order and bid IDs are blurred.</figcaption></figure>
+
   <p>Each day it indexes about 935,000 live listings, scores them against what he actually buys, and shows him 30,000 ranked names with GoDaddy and Estibot valuations side by side. He sets a max bid and walks away: the bid fires 1.5 seconds before close. The bidding strategy is his, encoded as one pure function we rewrote together after he watched the first version fire live and changed his mind. Its one hard rule: never place the first bid on a no bid auction, because that attracts competition. Let it die, then buy the closeout. If he gets outbid he gets one text. If he's already bidding on a name himself, the tool stands down rather than bid against him.</p>
+
+  <figure><img src="img/sniper-top-rated.jpg" alt="Top Rated tab of the auction sniper listing scored domains with GoDaddy and Estibot valuations and time left" loading="lazy" width="1400" height="1070"><figcaption>Top Rated: 913,278 listings scored, filtered to auctions ending within a day, with GoDaddy and Estibot valuations side by side.</figcaption></figure>
 
   <h3>It spends real money with no sandbox</h3>
   <p>GoDaddy's test environment doesn't work for these APIs, so every call is production. Every purchase passes a per purchase cap, a daily cap, a sanity check against the reference price, a kill switch, double buy locks, and a single checked path for dollar conversion, where a slipped decimal turns $2,600 into $26,000. Over the cap, the dashboard asks him to confirm the exact amount instead of silently refusing.</p>
@@ -115,6 +120,8 @@ section{scroll-margin-top:20px}
 
   <p>YOON is an independent electronic music festival I cofounded. The first one drew about 150 people. It's now past 1,000 guests, and the 8th edition runs three nights in May 2027 at Sequoia Highland Camp near Kings Canyon.</p>
 
+  <figure><img src="img/yoon-fest.jpg" alt="A lit wooden art installation at YOON Fest at night, with projections and purple lit trees" loading="lazy" width="1200" height="630"><figcaption>One of the art installs at YOON Fest.</figcaption></figure>
+
   <p>My side of it:</p>
   <ul>
     <li>Booking the lineup: getting avails from agents, sending offers and negotiating deals with local and international artists.</li>
@@ -159,6 +166,8 @@ section{scroll-margin-top:20px}
   <p class="meta">For Deep Steppe and YOON Fest · 2026 · <a href="https://github.com/lebronsunkle/autodm">code on GitHub</a></p>
 
   <p>The label and the festival sell records and tickets on Instagram. Comment to DM tools like ManyChat work, but they cost money every month and can't tell you which post actually sold the tickets. So I wrote my own.</p>
+
+  <figure><img src="img/autodm-admin.jpg" alt="Auto DM admin form for one Instagram post, set up as a vinyl release with a link, tracking name and optional reply text" loading="lazy" width="1400" height="1518"><figcaption>Setting up the DM for a single post: a Deep Steppe vinyl release with its link and tracking name for sales reports.</figcaption></figure>
 
   <p>Someone comments on a post and gets a DM with the link. Each post can be set up for a release, for tickets, for a guestlist (it asks for their name by DM, caps the list and keeps a waitlist, and prints a door list), or for a sold out show, where it collects emails for the next batch. Every link in a DM is a tracked short link, and a sync with Shotgun, our ticketing platform, counts each ticket bought through a DM against the post that sent it.</p>
 
