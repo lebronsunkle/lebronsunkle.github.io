@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adam Flores, Product Engineer</title>
+<meta name="description" content="Adam Flores, product engineer in Los Angeles. Case studies: a real money domain auction sniper, the Nameway.com storefront, Claude label agents, Auto DM and YOON Fest.">
+<meta property="og:title" content="Adam Flores, Product Engineer">
+<meta property="og:description" content="Case studies: a real money domain auction sniper, a 20,000 domain storefront, Claude agents, and more.">
+<meta property="og:type" content="website">
+<style>
+/* Plain one-column personal page: system type, black on white, one link color. No cards, no tiles, no pills. */
+:root{
+  --bg:#ffffff; --fg:#1d1d1f; --muted:#6b6b70; --rule:#e3e3e6; --link:#0b57d0;
+  --text:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#161618; --fg:#e8e8ea; --muted:#9a9aa1; --rule:#2c2c30; --link:#8ab4f8; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#161618; --fg:#e8e8ea; --muted:#9a9aa1; --rule:#2c2c30; --link:#8ab4f8; color-scheme:dark}
+
+body{background:var(--bg);color:var(--fg);font-family:var(--text);font-size:17px;line-height:1.65;margin:0}
+.page{max-width:680px;margin:0 auto;padding-inline:20px;padding-block:56px 80px}
+a{color:var(--link)}
+a:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+h1{font-size:28px;line-height:1.25;margin:0 0 4px}
+h2{font-size:22px;line-height:1.3;margin:0 0 4px}
+h3{font-size:17px;margin:24px 0 6px}
+p{margin:0 0 14px}
+ul{margin:0 0 14px;padding-left:22px}
+li{margin-bottom:6px}
+.meta{color:var(--muted);font-size:15px;margin:0 0 18px}
+.contact{color:var(--muted);font-size:15px}
+hr{border:0;border-top:1px solid var(--rule);margin:48px 0}
+.toc{margin:24px 0 0;padding-left:22px}
+.built{color:var(--muted);font-size:15px}
+section{scroll-margin-top:20px}
+@media (max-width:440px){ .page{padding-inline:16px} body{font-size:16px} }
+</style>
+</head>
+<body>
+
+<div class="page">
+<header>
+  <h1>Adam Flores</h1>
+  <p class="contact">Los Angeles · adam@deepsteppe.com · 949.677.9177 · <a href="https://github.com/lebronsunkle">GitHub</a> · <a href="https://www.linkedin.com/in/adam-f-75147811b">LinkedIn</a> · <a href="Adam-Flores-Case-Studies.pdf">These case studies (PDF)</a></p>
+  <p>I'm a product engineer at eWorldWideWeb, where I build the tools the company runs on, and an IT and AI student at the University of the Cumberlands (graduating June 2027). I also cofounded YOON Fest and run a small house music label, Deep Steppe. I'm looking for a product engineering or full stack role now, while I finish my degree: taking a real need from a real client to working software, and owning what happens after it ships. What I bring is judgment about what to build, what broke, and whether the fix is the right one. Below are write-ups of the projects I'd most like to talk about in an interview.</p>
+  <ol class="toc">
+    <li><a href="#sniper">Domain auction sniper</a></li>
+    <li><a href="#nameway">Nameway.com</a></li>
+    <li><a href="#yoon">YOON Fest</a></li>
+    <li><a href="#desk">The Deep Steppe label manager agents</a></li>
+    <li><a href="#autodm">Auto DM, an Instagram comment to DM bot</a></li>
+  </ol>
+</header>
+
+<hr>
+
+<section id="sniper">
+  <h2>Domain auction sniper</h2>
+  <p class="meta">Built for a domain investor at eWorldWideWeb · May 2026 to now · in daily use, spending real money · <a href="https://github.com/lebronsunkle/domain-auction-sniper">code on GitHub</a></p>
+
+  <p>It has bought domains fully hands off while the client slept, including names like neosono.com and shackmax.com that it held through a dead auction and grabbed the instant they relisted at $50. He's a 28 year veteran of GoDaddy's expiring list with 20,000 domains, not technical, and he now runs his sourcing through this tool instead of the 45 minutes a morning he used to spend scrolling by hand.</p>
+
+  <p>Each day it indexes about 935,000 live listings, scores them against what he actually buys, and shows him 30,000 ranked names with GoDaddy and Estibot valuations side by side. He sets a max bid and walks away: the bid fires 1.5 seconds before close. The bidding strategy is his, encoded as one pure function we rewrote together after he watched the first version fire live and changed his mind. Its one hard rule: never place the first bid on a no bid auction, because that attracts competition. Let it die, then buy the closeout. If he gets outbid he gets one text. If he's already bidding on a name himself, the tool stands down rather than bid against him.</p>
+
+  <h3>It spends real money with no sandbox</h3>
+  <p>GoDaddy's test environment doesn't work for these APIs, so every call is production. Every purchase passes a per purchase cap, a daily cap, a sanity check against the reference price, a kill switch, double buy locks, and a single checked path for dollar conversion, where a slipped decimal turns $2,600 into $26,000. Over the cap, the dashboard asks him to confirm the exact amount instead of silently refusing.</p>
+
+  <h3>What I got wrong, and what it taught me</h3>
+  <p>The guards never failed. What failed was observability: a real money system can look perfectly healthy while doing nothing. Twice this cost an auction. Once the worker hung for 19 hours with no errors, so I built a heartbeat, a watchdog, and a hard deadline on every cycle. The harder one: GoDaddy had been rate limiting us for weeks, the ban text came back unparseable, the parser called it "false," and the worker read false as "nothing for sale" and waited while the client bought the domain by hand in front of it. I rebuilt the state model so "unknown" can never be mistaken for a fact, added a circuit breaker that goes silent long enough for the ban to expire, wired a second price source so one blind sensor can't blind the system, and made the dashboard turn red. Then I wrote a script that rebuilds any domain's full timeline from the database, because by the time you ask "why didn't it buy," the logs are gone.</p>
+
+  <p class="built">Python, FastAPI, async SQLAlchemy and PostgreSQL on Neon, Docker on Fly.io, React on Cloudflare Pages. GoDaddy REST and SOAP, Estibot, Twilio, Resend, GitHub Actions. About 21,000 lines, 250+ commits, 287 tests; the money path can't deploy without them passing. The public repo has credentials, client data and scoring tuning removed.</p>
+</section>
+
+<hr>
+
+<section id="nameway">
+  <h2>Nameway.com</h2>
+  <p class="meta">eWorldWideWeb · 2026 · <a href="https://nameway.com">nameway.com</a></p>
+
+  <p>Nameway is the storefront for a portfolio of more than 20,000 domains. The old site was hard to shop, its inventory drifted out of sync with the registrar, and there was no way to pay online. I rebuilt it in WordPress, then kept building, because a store this size only works if it runs itself. The first Stripe sale came in September 2026.</p>
+
+  <h3>What's running today</h3>
+  <ul>
+    <li>A custom theme with a search grid, A to Z and by-length browsing, industry pages, and a landing page for every domain, so each name can rank in search on its own.</li>
+    <li>A checkout plugin: Stripe (card and ACH) under $5,000, an Escrow.com flow above it. Webhook signature verification, the async events ACH settlement needs, confirmation emails from a real mailbox instead of "WordPress", and listings that take themselves down when they sell.</li>
+    <li>An hourly sync against the GoDaddy account: sold names come off the site, new ones stage as drafts, and a dry-run report prints first so nothing changes by surprise.</li>
+    <li>Industry classification built on the 45 USPTO trademark classes, installed as a real taxonomy with buyer-friendly names and applied in reviewed batches with a human check, never one unchecked pass.</li>
+  </ul>
+
+  <h3>The logo pipeline: 19,460 vector logos</h3>
+  <p>Every listing needed artwork, so I built a pipeline around an AI design agent I direct. It generates true vector SVG wordmarks: 19,460 of them at about 38 MB total, where raster images would have run past a gigabyte. Letters are outline paths drawn from the domain string, so a misspelled logo is mechanically impossible. A server-side toolchain imports each file, attaches it as the listing's featured image, crops the viewBox, and caches per-logo geometry so letters render at equal height across 19,000 cards regardless of font or icon.</p>
+  <p>The part I would defend hardest in an interview is the verification discipline. The generator grades its own work, and I never let that be the only grade. My independent audits caught 4,803 bad word splits on the first pass and 255 more on the second, and the fix that stuck replaced a dictionary with frequency scoring against the catalog's own vocabulary: "heat" appears 38 times in the corpus and "theat" once, so sportheat splits after sport. Names that failed review shipped on a holdback list instead of blocking the other 98 percent. And when the client later changed the entire visual direction, the same wave pipeline repainted all 19,000 logos in an afternoon.</p>
+
+  <h3>What broke, and what it taught me</h3>
+  <ul>
+    <li>Logos imported by a root process came out root-owned. Apache refused to serve them, a redirect plugin bounced every image URL to the homepage, and the symptom read as broken images when the disease was file permissions. Ownership repair is now a step inside the pipeline, not a cleanup after it.</li>
+    <li>The site dropped into maintenance mode at 14:30 two days in a row. The same minute twice is a schedule, not a coincidence: a cron-driven auto update kept dying mid-flight and leaving its lock file behind. I disabled auto updates and made updating a deliberate, backup-first task.</li>
+    <li>My CLI tooling fataled twice for different reasons: a plugin's filesystem check pushes WordPress into FTP mode when run as root, and a core function my script relied on had been removed in a newer WordPress. Same lesson both times: plain prepared queries and an explicit filesystem method beat convenient wrappers that change underneath you.</li>
+    <li>WordPress files each upload under its parent post's date, so 500 logos scattered across month folders going back to 2020 and my first maintenance script only swept the current month. My globs now match what the system actually does, not what I assumed it does.</li>
+  </ul>
+
+  <h3>Hardening, and where it's going</h3>
+  <p>I also cleaned up the server itself: deleted a web-readable backup file that had been exposing payment gateway credentials, had the key rotated, forced every SVG upload through a sanitizer, and retired stale themes and dependencies.</p>
+  <p>The next step is convergence. Import, classify, generate, and attach already exist as separate proven tools, and they are becoming one intake command: a new price sheet turns into listings, categories, and logos with a review report, instead of a day of manual work. The human stays where judgment matters, approving low-confidence classifications and new artwork, and the machine does the rest.</p>
+  <p class="built">WordPress, PHP, MySQL, WP-CLI, Stripe, Escrow.com, GoDaddy API, bash and Python tooling, WHM and cPanel on Liquid Web.</p>
+</section>
+
+<hr>
+
+<section id="yoon">
+  <h2>YOON Fest</h2>
+  <p class="meta">Cofounder · <a href="https://www.instagram.com/yoonfest/">@yoonfest</a></p>
+
+  <p>YOON is an independent electronic music festival I cofounded. The first one drew about 150 people. It's now past 1,000 guests, and the 8th edition runs three nights in May 2027 at Sequoia Highland Camp near Kings Canyon.</p>
+
+  <p>My side of it:</p>
+  <ul>
+    <li>Booking the lineup: getting avails from agents, sending offers and negotiating deals with local and international artists.</li>
+    <li>Venue deals and permits, including the cost analysis and counter offers.</li>
+    <li>Sponsorships, which I lead.</li>
+    <li>Ticketing on Shotgun, where I'm working out a multi year partnership, and the marketing that sells the tickets.</li>
+    <li>This year's partnership with RAW CUTS, a big house and techno YouTube channel that will film the sets and help with booking and promotion.</li>
+    <li>The bars: I hire and schedule the bar staff and put together the drink menu.</li>
+    <li>Production and operations on the show days.</li>
+  </ul>
+  <p>The festival's Instagram has about 13,600 followers and 1.1 million video views. Running YOON is where I learned to negotiate and sell, and it's the reason Auto DM exists.</p>
+</section>
+
+<hr>
+
+<section id="desk">
+  <h2>Label manager agents and the Deep Steppe Desk</h2>
+  <p class="meta">Deep Steppe · 2026</p>
+
+  <p>Deep Steppe is my house label. Every release so far has sold out, but each one comes with a long list of chores: distributor uploads, playlist and radio pitching, socials, press emails and shipping, on top of signing artists and manufacturing. Running it alone, things slipped.</p>
+
+  <p>I set up a small team of Claude agents to take on that work. A label manager agent keeps the release calendar and hands tasks to two others: one builds releases with our distributor, the other handles pitching, submission forms, socials and press outreach. None of them can pay for, send or submit anything that needs my approval without it. Everything they do shows up on one dashboard, the Desk, where each release, task and outreach contact links straight to the page or form it needs and gets checked off as it's done.</p>
+
+  <h3>What the Desk covers</h3>
+  <ul>
+    <li>Releases: every release on the calendar with its date, its distributor status and links to the store and streaming pages, so I can see what's left before it ships.</li>
+    <li>Needs Adam: the short list of things only I can do, like a login, a purchase or a signature, each one linking to the exact page.</li>
+    <li>The outreach pipeline: every playlist curator, radio station and press contact, where they stand from drafted to sent to replied, and a link to the outlet or form. For one single, the agents sent individual pitches to more than 40 curators and filled out the free submission forms on their own.</li>
+    <li>Drafts waiting on me: pitch emails sit on the Desk with Read draft and Approve buttons. Nothing goes out until I approve it, and once I do, it goes to the whole list.</li>
+    <li>Deadlines and socials: pitch windows, submission deadlines and the posting schedule, plus scheduled check-ins, like pulling streaming numbers a few days after a release and pitching another round if they're low.</li>
+    <li>Shipping: for our CD release, the agents made a shipping label for every order, cropped them for the label printer, and marked each Bandcamp order shipped with its tracking number in the buyer email.</li>
+    <li>Message the team: a chat panel on the Desk where I give the agents instructions from my phone, and they pick them up in their next session.</li>
+  </ul>
+  <p>The Desk updates itself. When an agent finishes something, it checks it off without me asking. And whenever I have to step in, the agent writes what it learned into a shared skill file, so the next run handles that case without me. That's how a curator email that once sat unsent through a release week became a rule: drafts go up for approval the same day they're written.</p>
+  <p class="built">Claude agents with skills and scheduled tasks, working through Gmail, Google Calendar and Chrome. The Desk is a hosted page with a small shared database the agents read and write. My first version ran on a different agent platform and didn't hold up, so I rebuilt it on Claude.</p>
+</section>
+
+<hr>
+
+<section id="autodm">
+  <h2>Auto DM</h2>
+  <p class="meta">For Deep Steppe and YOON Fest · 2026 · <a href="https://github.com/lebronsunkle/autodm">code on GitHub</a></p>
+
+  <p>The label and the festival sell records and tickets on Instagram. Comment to DM tools like ManyChat work, but they cost money every month and can't tell you which post actually sold the tickets. So I wrote my own.</p>
+
+  <p>Someone comments on a post and gets a DM with the link. Each post can be set up for a release, for tickets, for a guestlist (it asks for their name by DM, caps the list and keeps a waitlist, and prints a door list), or for a sold out show, where it collects emails for the next batch. Every link in a DM is a tracked short link, and a sync with Shotgun, our ticketing platform, counts each ticket bought through a DM against the post that sent it.</p>
+
+  <p>Instagram webhooks deliver comments instantly once Meta approves the app; until then, and as a backup, it checks for new comments every minute. The same Worker also serves the deepsteppe.com homepage and its mailing list signup.</p>
+  <p class="built">JavaScript on Cloudflare Workers with a D1 (SQLite) database, the Instagram Graph API with OAuth, webhooks and cron, and the Shotgun Tickets API. About 1,900 lines. Costs nothing to run.</p>
+</section>
+
+<hr>
+<p class="contact">Thanks for reading. The best way to reach me is adam@deepsteppe.com.</p>
+</div>
+
+</body>
+</html>
