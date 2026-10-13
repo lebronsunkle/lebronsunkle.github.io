@@ -647,6 +647,13 @@ figure.wide{max-width:940px}
   if('scrollRestoration' in history){history.scrollRestoration='manual'}
   if(location.hash){history.replaceState(null,'',location.pathname+location.search)}
   window.scrollTo(0,0);
+  // Browsers can still jump after load (old #links, restored positions). Until the visitor
+  // scrolls or taps on their own, keep pinning the page to the top.
+  var touched=false;
+  ['wheel','touchstart','keydown','mousedown'].forEach(function(ev){addEventListener(ev,function(){touched=true},{passive:true,once:true})});
+  function top(){if(!touched){window.scrollTo(0,0)}}
+  addEventListener('load',function(){top();setTimeout(top,50);setTimeout(top,300);setTimeout(top,900)});
+  addEventListener('pageshow',function(){top();setTimeout(top,50)});
   // In-page links scroll to their section without adding #section to the address
   document.addEventListener('click',function(e){
     var a=e.target.closest&&e.target.closest('a[href^="#"]');if(!a)return;
