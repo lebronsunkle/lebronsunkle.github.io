@@ -643,6 +643,17 @@ figure.wide{max-width:940px}
 
 <script>
 (function(){
+  // Always open at the top: no remembered scroll position, no leftover #section in the address
+  if('scrollRestoration' in history){history.scrollRestoration='manual'}
+  if(location.hash){history.replaceState(null,'',location.pathname+location.search)}
+  window.scrollTo(0,0);
+  // In-page links scroll to their section without adding #section to the address
+  document.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('a[href^="#"]');if(!a)return;
+    var id=a.getAttribute('href').slice(1),el=id?document.getElementById(id):null;
+    e.preventDefault();
+    if(el){el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})}else{window.scrollTo({top:0,behavior:'smooth'})}
+  });
   // LA clock
   var t=document.getElementById('time');
   function tick(){try{t.textContent=new Date().toLocaleTimeString('en-US',{timeZone:'America/Los_Angeles',hour:'numeric',minute:'2-digit'})}catch(e){}}
