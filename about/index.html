@@ -67,7 +67,6 @@ h1 .u{position:relative;white-space:nowrap}
 h1 .u svg{position:absolute;left:-2%;bottom:-.12em;width:104%;height:.32em;overflow:visible}
 h1 .u path{stroke:var(--orange);stroke-width:5;fill:none;stroke-linecap:round}
 .lede{font-size:clamp(17px,2vw,20px);line-height:1.6;max-width:680px;margin:0;color:var(--body)}
-.lede strong{color:var(--ink);font-weight:600}
 
 /* ---------- sections ---------- */
 .sec{padding:90px 0 20px}
@@ -75,7 +74,7 @@ h1 .u path{stroke:var(--orange);stroke-width:5;fill:none;stroke-linecap:round}
 .h-sec .serif{font-weight:400}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
 .tile{position:relative;display:flex;flex-direction:column;background:var(--paper);border:1px solid var(--rule);border-radius:24px;padding:28px;color:var(--body);transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
-.tile:hover{text-decoration:none;transform:translateY(-4px);box-shadow:0 24px 40px -28px rgba(20,20,22,.35)}
+a.tile:hover{text-decoration:none;transform:translateY(-4px);box-shadow:0 24px 40px -28px rgba(20,20,22,.35)}
 .tile .t-label{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
 .tile h3{font-family:var(--display);color:var(--ink);font-size:26px;letter-spacing:-.03em;line-height:1.2;margin:0 0 10px}
 .tile p{font-size:16px;line-height:1.6;margin:0 0 14px}
@@ -84,15 +83,15 @@ h1 .u path{stroke:var(--orange);stroke-width:5;fill:none;stroke-linecap:round}
 .tile.dark{background:var(--ink);border-color:var(--ink);color:#d9d6cf}
 .tile.dark h3{color:#fff}
 .tile.dark .t-label{color:#9a968e}
-.tile.dark .tag{background:#232326;border-color:#34343a;color:#fff}
 .tile .more{font-weight:600;color:var(--lime);margin-top:6px}
 .chips{display:flex;flex-wrap:wrap;gap:22px;margin:4px 0 18px}
 .chips span{font-size:13.5px;line-height:1.35;color:#9a968e}
 .chips b{display:block;font-family:var(--display);font-weight:800;font-size:30px;letter-spacing:-.03em;line-height:1.1;color:#fff}
-.chips b sup{font-size:.45em;color:var(--lime);vertical-align:top;margin-left:2px}
 .t-wide{grid-column:span 2}
 .tile.lime{background:linear-gradient(140deg,var(--lime),#F5FFC9);border-color:#C9E54C}
 .tile.pink{background:linear-gradient(140deg,var(--pink),#FFE6F2);border-color:#F59BC8}
+.tile.lime .t-label{color:#4a5a12}
+.tile.pink .t-label{color:#7a2b55}
 
 /* ---------- contact ---------- */
 .end{margin-top:110px;background:var(--ink);color:#cfccc4;padding:70px 0 60px;border-radius:40px 40px 0 0;overflow:hidden;position:relative;isolation:isolate}
@@ -110,6 +109,7 @@ h1 .u path{stroke:var(--orange);stroke-width:5;fill:none;stroke-linecap:round}
 .lrow:hover .ar{transform:translateX(6px) rotate(-45deg)}
 .fine{font-family:var(--mono);font-size:12px;color:#8f8b83;margin-top:44px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
 .fine a{color:#cfccc4}
+.end a:focus-visible{outline-color:var(--lime)}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
 @media (max-width:760px){.grid{grid-template-columns:1fr}.t-wide{grid-column:auto}}
@@ -142,14 +142,14 @@ h1 .u path{stroke:var(--orange);stroke-width:5;fill:none;stroke-linecap:round}
   <div class="wrap">
     <p class="kicker">About me</p>
     <h1>I take <span class="serif u">messy, manual work<svg viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 14 C 70 4, 150 4, 297 11"/></svg></span> and turn it into software that runs on its own.</h1>
-    <p class="lede">I'm <strong>Adam Flores, a product engineer in Los Angeles.</strong> I start by mapping how the work actually gets done, then build the system that does it for you and keep it running after it ships.</p>
+    <p class="lede">I'm <strong>Adam Flores, a product engineer in Los Angeles.</strong> I start by mapping how the work actually gets done, then design the workflow and build the system around it.</p>
   </div>
 </section>
 
 <section class="sec" aria-labelledby="shipped">
   <div class="wrap">
     <p class="kicker">What I've shipped</p>
-    <h2 class="h-sec" id="shipped">Software people use <span class="serif">every day.</span></h2>
+    <h2 class="h-sec" id="shipped">Software that <span class="serif">runs on its own.</span></h2>
     <div class="grid">
       <a class="tile dark t-wide" href="/#sniper">
         <p class="t-label">Domain auction sniper</p>
@@ -171,13 +171,13 @@ h1 .u path{stroke:var(--orange);stroke-width:5;fill:none;stroke-linecap:round}
       <div class="tile">
         <p class="t-label">Auto DM</p>
         <h3>Instagram comment to DM bot</h3>
-        <p>Someone comments on a post and gets a DM back, and every ticket sale is attributed to the post that drove it.</p>
+        <p>Someone comments on a post and gets a DM back, and ticket sales are attributed to the post that drove them.</p>
         <div class="foot"><span class="tag">Ticket attribution</span><span class="tag">Open source</span></div>
       </div>
       <div class="tile t-wide">
         <p class="t-label">Claude label agents</p>
         <h3>A team of Claude agents runs my label's releases.</h3>
-        <p>Release planning, outreach and the dashboard that tracks them are handled by agents, so the label keeps moving while I build.</p>
+        <p>Agents and a self updating dashboard handle Deep Steppe's releases and outreach.</p>
       </div>
     </div>
   </div>
@@ -189,12 +189,12 @@ h1 .u path{stroke:var(--orange);stroke-width:5;fill:none;stroke-linecap:round}
     <h2 class="h-sec" id="clock">Records and <span class="serif">a festival.</span></h2>
     <div class="grid">
       <div class="tile lime">
-        <p class="t-label" style="color:#4a5a12">Deep Steppe</p>
+        <p class="t-label">Deep Steppe</p>
         <h3>Founder</h3>
         <p>A growing house music vinyl label.</p>
       </div>
       <div class="tile pink">
-        <p class="t-label" style="color:#7a2b55">YOON Fest</p>
+        <p class="t-label">YOON Fest</p>
         <h3>Cofounder</h3>
         <p>A 1,000 person community electronic music festival.</p>
       </div>
